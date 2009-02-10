@@ -1,34 +1,11 @@
 <?php
-$examplePMMSE = <<<EOD
-@var forecolor = #ff0000;
-@var backcolor = #00ff00;
 
-@mixin alert
-	border: 1px solid @backcolor
-	height: 100%
-
-@mixin clear
-	content: ''
-
-body 
-	color: @forecolor
-	background: @backcolor
-	
-	div 
-		margin: 0
-		
-#test
-	=alert
-	=clear
-	color: @forecolor
-EOD;
-
-class PMMSE {
+class PHPSaas {
 	
 	var $vars = array();
 	var $selectors = array();
 	
-	function PMMSE ($css = '') {
+	function PHPSaas ($css = '') {
 		$this->body = $css;
 		$this->extractVars();
 		$this->setVars();
@@ -37,6 +14,11 @@ class PMMSE {
 	}
 	
 	function extractVars() {
+		preg_match_all('/@import \'([^\']+)\'/', $this->body, $matches);
+		foreach($matches[0] as $key => $line) {
+			$this->body = str_replace($line, file_get_contents($matches[1][0].'.psaas'), $this->body);
+		}
+		
 		preg_match_all('/@var ([a-z]+) = ([^;]+);/', $this->body, $matches);
 		foreach($matches[1] as $key => $var) {
 			$this->vars[$var] = $matches[2][$key];
@@ -84,10 +66,7 @@ class PMMSE {
 	}
 	
 	function optimise() {
-		// $this->body = trim(preg_replace('/\}([^a-z]*)/', '} ', $this->body));
+		$this->body = trim(preg_replace('/\}([^a-z]*)/', '} ', $this->body));
 	}
 	
 }
-
-$pmmse = new PMMSE($examplePMMSE);
-echo $pmmse->body;

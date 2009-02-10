@@ -1,0 +1,23 @@
+@var forecolor = #ff0000;
+@var backcolor = #00ff00;
+
+@mixin alert
+	border: 1px solid @backcolor
+	height: 100%
+
+@mixin clear
+	content: ''
+
+body 
+	color: @forecolor
+	background: @backcolor
+	
+	div 
+		margin: 0
+		
+#test
+	=alert
+	=clear
+	color: @forecolor
+	
+@import 'styles/example2'
