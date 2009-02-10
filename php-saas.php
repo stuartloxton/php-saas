@@ -47,7 +47,7 @@ class PHPSaas {
 		$pastLevel = 0;
 		$this->body = '';
 		foreach($lines as $key => $line) {
-			if(eregi('\:', $line)) { //Rule
+			if(eregi('([a-z]+)\:', $line)) { //Rule
 				$this->body .= "\n\t".trim($line).';';
 			} elseif(eregi('(\t*)[a-z]', $line)) { // Selector
 				if($previousSelector) $this->body .= "\n}\n";
@@ -55,7 +55,7 @@ class PHPSaas {
 				$charCount = count_chars($line, 1);
 				if($charCount[9] > $pastLevel) {
 					$pastLevel = $pastLevel + 1;
-					$this->body .= $previousSelector.' ';
+					$this->body .= (eregi('(\t*)\:', $line)) ? $previousSelector : $previousSelector.' ';
 				}
 				
 				$this->body .= trim($line).' {';
