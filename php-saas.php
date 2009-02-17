@@ -7,10 +7,15 @@ class PHPSaas {
 	
 	function PHPSaas ($css = '') {
 		$this->body = $css;
+		$this->stripComments();
 		$this->extractVars();
 		$this->setVars();
 		$this->runIndentationLoop();
 		$this->optimise();
+	}
+	
+	function stripComments() {
+		$this->body = preg_replace('/\/\/([^\n]+)/', '', $this->body);
 	}
 	
 	function extractVars() {
@@ -49,16 +54,20 @@ class PHPSaas {
 		foreach($lines as $key => $line) {
 			if(eregi('([a-z]+)\:', $line)) { //Rule
 				$this->body .= "\n\t".trim($line).';';
-			} elseif(eregi('(\t*)[a-z]', $line)) { // Selector
+			} elseif(eregi('(\t*)[\.a-z]', $line)) { // Selector
 				if($previousSelector) $this->body .= "\n}\n";
-				
+				//echo $line."\n";
 				$charCount = count_chars($line, 1);
-				if($charCount[9] > $pastLevel) {
+				if(eregi('&', $line)) {
+					$pastLevel = $charCount[9];
+					$this->body .= str_replace('&', trim($previousSelector), trim($line)).' {';
+				} else if($charCount[9] > $pastLevel) {
 					$pastLevel = $pastLevel + 1;
 					$this->body .= (eregi('(\t*)\:', $line)) ? $previousSelector : $previousSelector.' ';
+					$this->body .= trim($line).' {';
+				} else {
+					$this->body .= trim($line).' {';
 				}
-				
-				$this->body .= trim($line).' {';
 				$previousSelector = trim($line);
 			}
 		}
@@ -66,7 +75,7 @@ class PHPSaas {
 	}
 	
 	function optimise() {
-		$this->body = trim(preg_replace('/\}([^a-z]*)/', '} ', $this->body));
+		$this->body = trim(preg_replace('/\}([\n]+)/', '} ', $this->body));
 	}
 	
 }

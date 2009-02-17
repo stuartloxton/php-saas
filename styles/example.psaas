@@ -17,10 +17,16 @@ body
 		
 		:hover
 			border: 1px solid red
+			
+		.ie6&
+			test:red
 		
 #test
 	=alert
 	=clear
 	color: @forecolor
 	
-@import 'styles/example2'
+.test
+	color: green
+	
+// @import 'styles/example2'
